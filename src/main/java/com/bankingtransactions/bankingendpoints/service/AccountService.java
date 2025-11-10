@@ -47,10 +47,11 @@ public class AccountService {
             savedAccount.setAccountNumber(generatedAccNumber);
 
             // 🔹 Step 4: Send welcome email using customer's email
+            String fullName = customer.getFirstName() + " " + customer.getLastName();
             emailService.sendEmail(
                     customer.getEmail(),
                     "Welcome to Harsh Bank!",
-                    "Dear " + customer.getFirstName() + ",\n\n"
+                    "Dear " + fullName + ",\n\n"
                             + "Your new account has been created successfully.\n"
                             + "Account Number: " + generatedAccNumber + "\n\n"
                             + "Thank you for choosing Harsh Bank!"
@@ -98,10 +99,11 @@ public class AccountService {
             accountRepository.delete(account);
 
             // 🔹 Step 2: Send account deletion email
+            String fullName = customer.getFirstName() + " " + customer.getLastName();
             emailService.sendEmail(
                     customer.getEmail(),
                     "Account Deletion Confirmation - Harsh Bank",
-                    "Dear " + customer.getFirstName() + ",\n\n"
+                    "Dear " + fullName + ",\n\n"
                             + "Your account (Account Number: " + account.getAccountNumber() + ") "
                             + "has been successfully deleted from Harsh Bank.\n\n"
                             + "If you did not request this action, please contact our support team immediately.\n\n"

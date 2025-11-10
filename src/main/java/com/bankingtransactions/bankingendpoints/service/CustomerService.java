@@ -17,6 +17,9 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public List<Customer> getAllCustomers(PageRequest pageRequest) {
         return customerRepository.findAll(pageRequest).getContent();
     }
@@ -26,7 +29,22 @@ public class CustomerService {
     }
 
     public Customer createCustomer(Customer customer) {
-        return customerRepository.save(customer);
+
+        Customer savedCustomer = customerRepository.save(customer);
+
+        String fullName = savedCustomer.getFirstName() + " " + savedCustomer.getLastName();
+
+        // ✅ Send welcome email
+        emailService.sendEmail(
+                savedCustomer.getEmail(),
+                "Welcome to Harsh Bank!",
+                "Dear " + fullName + ",\n\n" +
+                        "Thank you for registering with Harsh Bank.\n" +
+                        "Your profile has been successfully created.\n\n" +
+                        "We’re excited to have you with us!\n\n" +
+                        "Warm regards,\nHarsh Bank Support"
+        );
+        return savedCustomer;
     }
 
     public Optional<Customer> updateCustomer(Long id, Customer customerDetails) {
@@ -43,6 +61,19 @@ public class CustomerService {
     public boolean deleteCustomer(Long id) {
         return customerRepository.findById(id).map(customer -> {
             customerRepository.delete(customer);
+
+            String fullName = customer.getFirstName() + " " + customer.getLastName();
+
+            // ✅ Send account deletion email
+            emailService.sendEmail(
+                    customer.getEmail(),
+                    "Goodbye from Harsh Bank",
+                    "Dear " + fullName + ",\n\n" +
+                            "Your profile has been deleted from Harsh Bank.\n" +
+                            "We’re sorry to see you go. If you ever wish to return, you’re always welcome.\n\n" +
+                            "Thank you for being part of our banking family.\n\n" +
+                            "Best regards,\nHarsh Bank Support"
+            );
             return true;
         }).orElse(false);
     }
