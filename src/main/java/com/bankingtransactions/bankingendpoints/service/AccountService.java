@@ -1,6 +1,7 @@
 package com.bankingtransactions.bankingendpoints.service;
 
 import com.bankingtransactions.bankingendpoints.model.Account;
+import com.bankingtransactions.bankingendpoints.model.Customer;
 import com.bankingtransactions.bankingendpoints.repository.AccountRepository;
 import com.bankingtransactions.bankingendpoints.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class AccountService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private EmailService emailService;
 
 
 
@@ -33,20 +36,31 @@ public class AccountService {
 
     public Optional<Account> createAccount(Long customerId, Account account) {
         return customerRepository.findById(customerId).map(customer -> {
-            // 🔹 Step 1: Set the customer to link the relationship
+            // 🔹 Step 1: Link customer with account
             account.setCustomer(customer);
 
-            // 🔹 Step 2: Save account initially
+            // 🔹 Step 2: Save account initially (to generate ID)
             Account savedAccount = accountRepository.save(account);
 
-            // 🔹 Step 3: Generate and set account number after ID is known
+            // 🔹 Step 3: Generate account number after saving
             String generatedAccNumber = String.format("ACC%05d", savedAccount.getAccountId());
             savedAccount.setAccountNumber(generatedAccNumber);
 
-            // 🔹 Step 4: Save again with account number
+            // 🔹 Step 4: Send welcome email using customer's email
+            emailService.sendEmail(
+                    customer.getEmail(),
+                    "Welcome to Harsh Bank!",
+                    "Dear " + customer.getFirstName() + ",\n\n"
+                            + "Your new account has been created successfully.\n"
+                            + "Account Number: " + generatedAccNumber + "\n\n"
+                            + "Thank you for choosing Harsh Bank!"
+            );
+
+            // 🔹 Step 5: Save again with generated account number
             return accountRepository.save(savedAccount);
         });
     }
+
 
 
 
@@ -76,10 +90,26 @@ public class AccountService {
 
 
 
-    public boolean deleteAccount(Long id) {
-        return accountRepository.findById(id).map(account -> {
+    public boolean deleteAccount(Long accountId) {
+        return accountRepository.findById(accountId).map(account -> {
+            Customer customer = account.getCustomer();
+
+            // 🔹 Step 1: Delete the account
             accountRepository.delete(account);
+
+            // 🔹 Step 2: Send account deletion email
+            emailService.sendEmail(
+                    customer.getEmail(),
+                    "Account Deletion Confirmation - Harsh Bank",
+                    "Dear " + customer.getFirstName() + ",\n\n"
+                            + "Your account (Account Number: " + account.getAccountNumber() + ") "
+                            + "has been successfully deleted from Harsh Bank.\n\n"
+                            + "If you did not request this action, please contact our support team immediately.\n\n"
+                            + "Thank you for being with Harsh Bank."
+            );
+
             return true;
         }).orElse(false);
     }
+
 }

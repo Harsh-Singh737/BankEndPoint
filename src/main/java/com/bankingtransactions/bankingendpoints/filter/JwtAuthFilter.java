@@ -32,14 +32,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // 🔸 Skip JWT check for login endpoint
+        // ✅ Skip JWT for all non-admin routes
+        if (!path.startsWith("/api/admin/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ Skip JWT for admin login endpoint (public)
         if (path.equals("/api/admin/login")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 🧾 Continue normal JWT validation for /api/admin/** routes
+        // ✅ Continue normal JWT validation only for /api/admin/** endpoints
         String authHeader = request.getHeader("Authorization");
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
@@ -49,7 +56,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String username = jwtUtil.extractUsername(token);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Validate and set context
             if (jwtUtil.validateToken(token, username)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
@@ -59,7 +65,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
-
 }
-
