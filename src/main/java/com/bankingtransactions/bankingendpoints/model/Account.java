@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -24,6 +25,10 @@ public class Account {
     private String accountType;
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal balance;
+
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    private LocalDateTime createdAt;
+
 
 
     @ManyToOne(fetch = FetchType.LAZY)
