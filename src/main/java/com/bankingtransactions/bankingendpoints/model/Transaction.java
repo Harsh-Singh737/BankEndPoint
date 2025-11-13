@@ -1,5 +1,6 @@
 package com.bankingtransactions.bankingendpoints.model;
 
+import com.bankingtransactions.bankingendpoints.listener.TransactionEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@EntityListeners(TransactionEntityListener.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

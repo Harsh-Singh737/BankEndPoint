@@ -28,10 +28,7 @@ public class MonthlyStatementService {
     @Autowired
     private JavaMailSender mailSender;
 
-    /**
-     * 🕒 Automatically send statements on the 1st of every month at 8:00 AM
-     * Format: second minute hour day month weekday
-     */
+
     @Scheduled(cron = "0 0 8 1 * *") // Run on 1st day of each month at 8 AM
     public void sendMonthlyStatementsToSelectedCustomers() {
 
@@ -44,7 +41,7 @@ public class MonthlyStatementService {
         for (String email : selectedEmails) {
             Customer customer = customerRepository.findByEmail(email);
             if (customer == null) {
-                System.out.println("⚠️ No customer found with email: " + email);
+                System.out.println("No customer found with email: " + email);
                 continue;
             }
             sendStatementForCustomer(customer);
@@ -72,7 +69,7 @@ public class MonthlyStatementService {
                 );
 
         if (transactions.isEmpty()) {
-            System.out.println("⚠️ No transactions found for: " + customer.getEmail());
+            System.out.println("No transactions found for: " + customer.getEmail());
             return;
         }
 
@@ -89,7 +86,7 @@ public class MonthlyStatementService {
             helper.setText(htmlContent, true);
 
             mailSender.send(mimeMessage);
-            System.out.println("📧 Sent monthly statement to: " + customer.getEmail());
+            System.out.println("Sent monthly statement to: " + customer.getEmail());
 
         } catch (Exception e) {
             e.printStackTrace();

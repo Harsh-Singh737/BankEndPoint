@@ -22,10 +22,6 @@ public class TransactionService {
     @Autowired
     private AccountRepository accountRepository;
 
-    public List<Transaction> getAllTransactions(PageRequest pageRequest) {
-        return transactionRepository.findAll(pageRequest).getContent();
-    }
-
     public Optional<Transaction> getTransactionById(Long id) {
         return transactionRepository.findById(id);
     }

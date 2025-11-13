@@ -4,10 +4,7 @@ import com.bankingtransactions.bankingendpoints.model.Account;
 import com.bankingtransactions.bankingendpoints.model.Customer;
 import com.bankingtransactions.bankingendpoints.model.Transaction;
 import com.bankingtransactions.bankingendpoints.model.Transfer;
-import com.bankingtransactions.bankingendpoints.service.AccountService;
-import com.bankingtransactions.bankingendpoints.service.CustomerService;
-import com.bankingtransactions.bankingendpoints.service.TransactionService;
-import com.bankingtransactions.bankingendpoints.service.TransferService;
+import com.bankingtransactions.bankingendpoints.service.*;
 import com.bankingtransactions.bankingendpoints.uitils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -28,16 +25,7 @@ public class AdminController {
 
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private TransactionService transactionService;
-
-    @Autowired
-    private TransferService transferService;
+    private AdminService adminService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -68,7 +56,7 @@ public class AdminController {
                     ? Sort.by(sortBy).ascending()
                     : Sort.by(sortBy).descending();
 
-            List<Account> accounts = accountService.getAllAccounts(PageRequest.of(pageNo, pageSize, sort));
+            List<Account> accounts = adminService.getAllAccounts(PageRequest.of(pageNo, pageSize, sort));
             return ResponseEntity.ok(accounts);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -85,7 +73,7 @@ public class AdminController {
             Sort sort = sortOrder.equalsIgnoreCase("ASC")
                     ? Sort.by(sortBy).ascending()
                     : Sort.by(sortBy).descending();
-            List<Customer> customers = customerService.getAllCustomers(PageRequest.of(pageNo, pageSize, sort));
+            List<Customer> customers = adminService.getAllCustomers(PageRequest.of(pageNo, pageSize, sort));
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -102,7 +90,7 @@ public class AdminController {
             Sort sort = sortOrder.equalsIgnoreCase("ASC")
                     ? Sort.by(sortBy).ascending()
                     : Sort.by(sortBy).descending();
-            List<Transaction> transactions = transactionService.getAllTransactions(PageRequest.of(pageNo, pageSize, sort));
+            List<Transaction> transactions = adminService.getAllTransactions(PageRequest.of(pageNo, pageSize, sort));
             return ResponseEntity.ok(transactions);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -119,7 +107,7 @@ public class AdminController {
             Sort sort = sortOrder.equalsIgnoreCase("ASC")
                     ? Sort.by(sortBy).ascending()
                     : Sort.by(sortBy).descending();
-            List<Transfer> transactions = transferService.getAllTransfers(PageRequest.of(pageNo, pageSize, sort));
+            List<Transfer> transactions = adminService.getAllTransfers(PageRequest.of(pageNo, pageSize, sort));
             return ResponseEntity.ok(transactions);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -5,10 +5,8 @@ import com.bankingtransactions.bankingendpoints.model.Customer;
 import com.bankingtransactions.bankingendpoints.repository.AccountRepository;
 import com.bankingtransactions.bankingendpoints.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,12 +20,6 @@ public class AccountService {
 
     @Autowired
     private EmailService emailService;
-
-
-
-    public List<Account> getAllAccounts(PageRequest pageRequest) {
-        return accountRepository.findAll(pageRequest).getContent();
-    }
 
 
     public Optional<Account> getAccountById(Long id) {

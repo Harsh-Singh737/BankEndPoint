@@ -2,10 +2,8 @@ package com.bankingtransactions.bankingendpoints.service;
 
 import com.bankingtransactions.bankingendpoints.model.Customer;
 import com.bankingtransactions.bankingendpoints.repository.CustomerRepository;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,10 +17,6 @@ public class CustomerService {
 
     @Autowired
     private EmailService emailService;
-
-    public List<Customer> getAllCustomers(PageRequest pageRequest) {
-        return customerRepository.findAll(pageRequest).getContent();
-    }
 
     public Optional<Customer> getCustomerById(Long id) {
         return customerRepository.findById(id);
