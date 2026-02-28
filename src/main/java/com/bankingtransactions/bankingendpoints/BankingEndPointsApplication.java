@@ -14,7 +14,6 @@ import java.util.List;
 public class BankingEndPointsApplication {
 
 	public static void main(String[] args) {
-
         SpringApplication.run(BankingEndPointsApplication.class, args);
 	}
 

@@ -15,14 +15,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@Component
+
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    public JwtAuthFilter(JwtUtil jwtUtil){
+        this.jwtUtil = jwtUtil;
+    }
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

@@ -143,3 +143,134 @@ public class MonthlyStatementService {
         return sb.toString();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    private void sendFullStatementForCustomer(Customer customer) {
+//
+//        List<Account> accounts = customer.getAccounts();
+//
+//        if (accounts == null || accounts.isEmpty()) {
+//            System.out.println("Customer has no accounts: " + customer.getEmail());
+//            return;
+//        }
+//
+//        LocalDateTime earliestStart = null;
+//        LocalDateTime end = LocalDateTime.now();
+//
+//        StringBuilder emailContent = new StringBuilder();
+//        emailContent.append("<html><body>");
+//        emailContent.append("<h2 style='color:#2E86C1;'>Harsh Bank - Full Transaction Statement</h2>");
+//        emailContent.append("<p>Dear <b>")
+//                .append(customer.getFirstName()).append(" ").append(customer.getLastName())
+//                .append("</b>,</p>");
+//
+//        boolean hasAnyTransaction = false;
+//
+//        // Loop through all accounts
+//        for (Account acc : accounts) {
+//
+//            // Find earliest transaction for this account
+//            Transaction firstTxn = transactionRepository
+//                    .findTopByAccount_AccountIdOrderByTransactionDateAsc(acc.getAccountId());
+//
+//            if (firstTxn == null) {
+//                System.out.println("⚠️ No transactions for account: " + acc.getAccountNumber());
+//                continue;
+//            }
+//
+//            // Update earliestStart across all accounts
+//            if (earliestStart == null || firstTxn.getTransactionDate().isBefore(earliestStart)) {
+//                earliestStart = firstTxn.getTransactionDate();
+//            }
+//
+//            // Fetch all transactions for this account
+//            List<Transaction> transactions = transactionRepository
+//                    .findByAccount_AccountIdAndTransactionDateBetween(
+//                            acc.getAccountId(),
+//                            firstTxn.getTransactionDate(),
+//                            end
+//                    );
+//
+//            if (transactions.isEmpty()) continue;
+//
+//            hasAnyTransaction = true;
+//
+//            // Build table for this account
+//            emailContent.append("<h3>Account: ")
+//                    .append(acc.getAccountNumber())
+//                    .append("</h3>");
+//            emailContent.append(buildHtmlTransactionTable(transactions));
+//        }
+//
+//        // If no transactions at all
+//        if (!hasAnyTransaction) {
+//            System.out.println("No transactions found for customer: " + customer.getEmail());
+//            return;
+//        }
+//
+//        // Add date range at top
+//        emailContent.insert(emailContent.indexOf("</p>") + 4,
+//                "<p>Statement period: <b>" +
+//                        earliestStart.toLocalDate() + "</b> to <b>" +
+//                        end.toLocalDate() + "</b></p><br>"
+//        );
+//
+//        emailContent.append("<br><p>Thank you for banking with <b>Harsh Bank</b>!</p>");
+//        emailContent.append("</body></html>");
+//
+//        // Send email
+//        sendHtmlEmail(
+//                customer.getEmail(),
+//                "Your Full Transaction Statement",
+//                emailContent.toString()
+//        );
+//    }
+
+
+
+
+
+
+// transaction repo  ------->
+//List<Transaction> findByAccount_AccountIdAndTransactionDateBetween(
+//        Long accountId,
+//        LocalDateTime start,
+//        LocalDateTime end
+//);
+//
+//Transaction findTopByAccount_AccountIdOrderByTransactionDateAsc(Long accountId);

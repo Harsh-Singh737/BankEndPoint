@@ -1,5 +1,6 @@
 package com.bankingtransactions.bankingendpoints.controller;
 
+import com.bankingtransactions.bankingendpoints.config.RateLimiterConfig;
 import com.bankingtransactions.bankingendpoints.model.Account;
 import com.bankingtransactions.bankingendpoints.model.Customer;
 import com.bankingtransactions.bankingendpoints.model.Transaction;
@@ -33,6 +34,9 @@ public class AdminController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private RateLimiterConfig limiter;
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -52,12 +56,16 @@ public class AdminController {
             @RequestParam(defaultValue = "ASC") String sortOrder) {
 
         try {
-            Sort sort = sortOrder.equalsIgnoreCase("ASC")
-                    ? Sort.by(sortBy).ascending()
-                    : Sort.by(sortBy).descending();
+            if (limiter.getBucket().tryConsume(1)){
+                Sort sort = sortOrder.equalsIgnoreCase("ASC")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
 
-            List<Account> accounts = adminService.getAllAccounts(PageRequest.of(pageNo, pageSize, sort));
-            return ResponseEntity.ok(accounts);
+                List<Account> accounts = adminService.getAllAccounts(PageRequest.of(pageNo, pageSize, sort));
+                return ResponseEntity.ok(accounts);
+            }else {
+                return ResponseEntity.status(429).body("Too Many Request.");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error while fetching accounts: " + e.getMessage());

@@ -15,5 +15,6 @@ public class Notification {
     private String type; // INFO, ALERT, WARNING, etc.
     private String recipientEmail;
     private LocalDateTime timestamp = LocalDateTime.now();
-    private boolean read = false;
+    @Column(name = "is_read")
+    private boolean read;
 }
