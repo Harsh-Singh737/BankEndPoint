@@ -1,5 +1,6 @@
 package com.bankingtransactions.bankingendpoints.controller;
 
+import com.bankingtransactions.bankingendpoints.exception.ResourceNotFoundException;
 import com.bankingtransactions.bankingendpoints.model.Account;
 import com.bankingtransactions.bankingendpoints.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,64 +19,44 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAccountById(@PathVariable Long id) {
-        try {
-            Account account = accountService.getAccountById(id)
-                    .orElseThrow(() -> new RuntimeException("Account not found with ID: " + id));
-            return ResponseEntity.ok(account);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error fetching account: " + e.getMessage());
-        }
-    }
+    public ResponseEntity<Account> getAccountById(@PathVariable Long id) {
 
+        Account account = accountService.getAccountById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Account not found with ID: " + id));
+
+        return ResponseEntity.ok(account);
+    }
 
     @PostMapping("/customer/{customerId}")
-    public ResponseEntity<?> createAccount(@PathVariable Long customerId, @RequestBody Account account) {
-        try {
-            Account createdAccount = accountService.createAccount(customerId, account)
-                    .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + customerId));
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error creating account: " + e.getMessage());
-        }
+    public ResponseEntity<Account> createAccount(@PathVariable Long customerId,
+                                                 @RequestBody Account account) {
+
+        Account createdAccount = accountService.createAccount(customerId, account)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Customer not found with ID: " + customerId));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
     }
-
-
 
     @PutMapping("/update-account/{accountId}")
-    public ResponseEntity<?> updateAccount(@PathVariable Long accountId, @RequestBody Account updatedData) {
-        try {
-            Account updatedAccount = accountService.updateAccount(accountId, updatedData);
-            return ResponseEntity.ok(updatedAccount);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error updating account: " + e.getMessage());
-        }
+    public ResponseEntity<Account> updateAccount(@PathVariable Long accountId,
+                                                 @RequestBody Account updatedData) {
+
+        Account updatedAccount = accountService.updateAccount(accountId, updatedData);
+        return ResponseEntity.ok(updatedAccount);
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
-        try {
-            boolean deleted = accountService.deleteAccount(id);
-            if (deleted) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found with ID: " + id);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error deleting account: " + e.getMessage());
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+
+        boolean deleted = accountService.deleteAccount(id);
+
+        if (!deleted) {
+            throw new ResourceNotFoundException("Account not found with ID: " + id);
         }
+
+        return ResponseEntity.noContent().build();
     }
 }

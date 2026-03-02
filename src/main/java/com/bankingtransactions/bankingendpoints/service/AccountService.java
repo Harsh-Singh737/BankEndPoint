@@ -1,11 +1,14 @@
 package com.bankingtransactions.bankingendpoints.service;
 
+import com.bankingtransactions.bankingendpoints.eventListener.AccountCreatedEvent;
 import com.bankingtransactions.bankingendpoints.model.Account;
 import com.bankingtransactions.bankingendpoints.model.Customer;
 import com.bankingtransactions.bankingendpoints.repository.AccountRepository;
 import com.bankingtransactions.bankingendpoints.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -21,11 +24,15 @@ public class AccountService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
 
     public Optional<Account> getAccountById(Long id) {
         return accountRepository.findById(id);
     }
 
+    @Transactional
     public Optional<Account> createAccount(Long customerId, Account account) {
         return customerRepository.findById(customerId).map(customer -> {
             // 🔹 Step 1: Link customer with account
@@ -38,19 +45,21 @@ public class AccountService {
             String generatedAccNumber = String.format("ACC%05d", savedAccount.getAccountId());
             savedAccount.setAccountNumber(generatedAccNumber);
 
-            // 🔹 Step 4: Send welcome email using customer's email
+            // 🔹 Step 4: Save again with generated account number
+            Account finalAccount = accountRepository.save(savedAccount);
+
             String fullName = customer.getFirstName() + " " + customer.getLastName();
-            emailService.sendEmail(
-                    customer.getEmail(),
-                    "Welcome to Harsh Bank!",
-                    "Dear " + fullName + ",\n\n"
-                            + "Your new account has been created successfully.\n"
-                            + "Account Number: " + generatedAccNumber + "\n\n"
-                            + "Thank you for choosing Harsh Bank!"
+
+            // 🔹 Step 5: Sending mail Async
+            eventPublisher.publishEvent(
+                    new AccountCreatedEvent(
+                            customer.getEmail(),
+                            fullName,
+                            generatedAccNumber
+                    )
             );
 
-            // 🔹 Step 5: Save again with generated account number
-            return accountRepository.save(savedAccount);
+            return finalAccount;
         });
     }
 
