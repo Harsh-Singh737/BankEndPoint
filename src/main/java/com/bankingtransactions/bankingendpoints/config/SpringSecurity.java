@@ -34,8 +34,8 @@ public class SpringSecurity {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        var admin = User.withUsername("Harsh")
-                .password(passwordEncoder.encode("Harsh@7864"))
+        var admin = User.withUsername("userName")
+                .password(passwordEncoder.encode("password"))
                 .roles("ADMIN")
                 .build();
 
