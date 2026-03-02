@@ -78,11 +78,15 @@ public class AdminController {
                                             @RequestParam(defaultValue = "customerId") String sortBy,
                                             @RequestParam(defaultValue = "ASC") String sortOrder) {
         try {
-            Sort sort = sortOrder.equalsIgnoreCase("ASC")
-                    ? Sort.by(sortBy).ascending()
-                    : Sort.by(sortBy).descending();
-            List<Customer> customers = adminService.getAllCustomers(PageRequest.of(pageNo, pageSize, sort));
-            return ResponseEntity.ok(customers);
+            if (limiter.getBucket().tryConsume(1)){
+                Sort sort = sortOrder.equalsIgnoreCase("ASC")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
+                List<Customer> customers = adminService.getAllCustomers(PageRequest.of(pageNo, pageSize, sort));
+                return ResponseEntity.ok(customers);
+            }else {
+                return ResponseEntity.status(429).body("Too Many Requests.");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error while fetching customers: " + e.getMessage());
@@ -95,11 +99,15 @@ public class AdminController {
                                                 @RequestParam(defaultValue = "transactionId") String sortBy,
                                                 @RequestParam(defaultValue = "ASC") String sortOrder) {
         try {
-            Sort sort = sortOrder.equalsIgnoreCase("ASC")
-                    ? Sort.by(sortBy).ascending()
-                    : Sort.by(sortBy).descending();
-            List<Transaction> transactions = adminService.getAllTransactions(PageRequest.of(pageNo, pageSize, sort));
-            return ResponseEntity.ok(transactions);
+            if (limiter.getBucket().tryConsume(1)){
+                Sort sort = sortOrder.equalsIgnoreCase("ASC")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
+                List<Transaction> transactions = adminService.getAllTransactions(PageRequest.of(pageNo, pageSize, sort));
+                return ResponseEntity.ok(transactions);
+            }else {
+                return ResponseEntity.status(429).body("Too Many Request.");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error while fetching transactions: " + e.getMessage());
@@ -112,11 +120,15 @@ public class AdminController {
                                              @RequestParam(defaultValue = "transferId") String sortBy,
                                              @RequestParam(defaultValue = "ASC") String sortOrder) {
         try {
-            Sort sort = sortOrder.equalsIgnoreCase("ASC")
-                    ? Sort.by(sortBy).ascending()
-                    : Sort.by(sortBy).descending();
-            List<Transfer> transactions = adminService.getAllTransfers(PageRequest.of(pageNo, pageSize, sort));
-            return ResponseEntity.ok(transactions);
+            if (limiter.getBucket().tryConsume(1)){
+                Sort sort = sortOrder.equalsIgnoreCase("ASC")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
+                List<Transfer> transactions = adminService.getAllTransfers(PageRequest.of(pageNo, pageSize, sort));
+                return ResponseEntity.ok(transactions);
+            }else{
+                return ResponseEntity.status(429).body("Too Many Request.");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error while fetching transactions: " + e.getMessage());
